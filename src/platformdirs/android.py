@@ -123,7 +123,12 @@ def _android_folder() -> str | None:
         # First try to get a path to android app via pyjnius
         from jnius import autoclass  # noqa: PLC0415
 
-        context = autoclass("android.content.Context")
+        try:
+            from android import mActivity
+            context = cast('android.content.Context', mActivity.getApplicationContext())
+        except:
+            context = autoclass("android.content.Context")  
+
         result: str | None = context.getFilesDir().getParentFile().getAbsolutePath()
     except Exception:  # noqa: BLE001
         # if fails find an android folder looking a path on the sys.path
